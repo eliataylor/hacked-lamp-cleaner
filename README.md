@@ -1,23 +1,28 @@
-# hacked-lamp-cleaner
+# Hacked LAMP cleaner
 ## A PHP script to scan, copy, save, and delete infected files like "eval(base64_decode(" and any other strings
 
 ```
 php cleaner.php /path/to/clean html,php,extensions recursive|not aggressive|not
 ```
 
-####Examples:
+#### Examples:
 ```
 php cleaner.php / html,php true true ` // clean all html and php files from root while removing whitespace from all files
 php cleaner.php /folder false false` // clean only files inside /folder strictly matching whitespace
 ```
 
 
-####Testing:
+#### Testing:
 
 1. Set your flags inside badFlags.php with the prefix and suffix of any offensive code to strip out
 
 2. Create a folder called "hacked" anywhere on your infected server or locally for testing
-`mkdir hacked`
+```
+git clone https://github.com/eliataylor/hacked-lamp-cleaner.git hacked --depth=1
+cd hacked
+php cleaner.php /path/to/clean html,php,extensions recursive|not aggressive|not
+```
+
 
 3. Copy all index.php and index.html files on the infected server to test this script
 ```
