@@ -1,5 +1,5 @@
-# Hacked LAMP cleaner
-## A PHP script to  scan/copy/replace injected malicious code -  `"eval(base64_decode(..."` - from any files your server
+# Cleaner script for hacked LAMP servers
+## scan/copy/replace/review injected malicious code -  `"eval(base64_decode(..."` - from any files your server
 
 ```
 php cleaner.php /path/to/clean html,php,extensions recursive|not aggressive|not
@@ -15,7 +15,7 @@ php cleaner.php /folder html false // clean only .html files, only inside /folde
 #### CONFIGURE & TEST:
 
 1. These are examples, but were a few patterns that I found around known infected files.
-Each row's key is matched against every file searched. If its value is FALSE, we just remove the key. Else clear until and including the key and suffix.
+Each row's key is matched against every file searched. If its value is FALSE, we just remove the key; else clear until-and-including the key and suffix.
 ```
 $badFlags = array(
   'ANY STRING SEARCHED AND REPLACED'=>false,
@@ -33,14 +33,14 @@ $badFlags = array(
 ```
 
 
-2. Create a folder called "hacked" anywhere on your infected server or locally for testing
+2. Run inside of /hacked folder
 ```
 git clone https://github.com/eliataylor/hacked-lamp-cleaner.git hacked --depth=1
 cd hacked
 ```
 
 
-3. Copy all index.php and index.html files on the infected server to the /tests directory
+3. Copy all your index.php and index.html files on the infected server to the /tests directory
 ```
 rsync -rav -e ssh --include '*/' --include='index.php' --exclude='*' username@server.com:/* tests/
 rsync -rav -e ssh --include '*/' --include='index.html' --exclude='*' username@server.com:/* tests/
@@ -58,12 +58,12 @@ mkdir __vault__
 cp -R tests/* __vault__/
 ```
 
-6. Lastly execute from CLI: `php cleaner.php tests html,php true | php review.php > review.html`
+6. Run: `php cleaner.php tests html,php true | php review.php > review.html`
 
-7. Open `review.html` in any browser to review any files modified and all bad code striped. If you have a JSONViewer, review the `infected.json` file. While testing, after adjusting your badFlags, re-run fresh:
+7. Open `review.html` in any browser to review any files modified and all bad code striped. If you have a JSONViewer, you can also review the raw `infected.json` file. While testing and adjusting your `$badFlags` array, run fresh:
 ```
 rm -R __badcode__/ | rm infected.json | cp -R __vault__/* tests/ | php cleaner.php tests html,php true
 php review.php > review.html
 ```
 
-#### Delete all of things from your server when done w/ `rm -R ../hacked`
+#### Delete all of things from your server when done: `rm -R ../hacked`
