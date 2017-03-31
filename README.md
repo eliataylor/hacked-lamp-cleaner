@@ -1,8 +1,18 @@
 # hacked-lamp-cleaner
 ## A PHP script to scan, copy, save, and delete infected files like "eval(base64_decode(" and any other strings
 
+```
+php cleaner.php /path/to/clean html,php,extensions recursive|not aggressive|not
+```
 
-Setup with Bash
+####Examples:
+```
+php cleaner.php / html,php true true ` // clean all html and php files from root while removing whitespace from all files
+php cleaner.php /folder false false` // clean only files inside /folder strictly matching whitespace
+```
+
+
+####Testing:
 
 1. Set your flags inside badFlags.php with the prefix and suffix of any offensive code to strip out
 
@@ -23,17 +33,14 @@ mkdir __vault__
 cp -R tests/* __vault__/
 ```
 
-6. Execute from CLI inside /hacked: `php cleaner.php tests true`
+6. Execute from CLI inside /hacked: `php cleaner.php tests html,php true | php review.php > review.html`
 
-7. Review the files created in the __badcode__ folder to make sure all code includes both your badFlag keys, suffix, and all code in between.
+7. Open `review.html` in any browser to review files changed and bad code striped
 
-7a. If it does not, adjust your badFlags and run
+7a. While testing, after adjusting your badFlags, re-run fresh:
 ```
-rm -R __badcode__/ | rm infected.json | cp -R __vault__/* tests/ | php cleaner.php tests true
+rm -R __badcode__/ | rm infected.json | cp -R __vault__/* tests/ | php cleaner.php tests html,php true
 php review.php > review.html
 ```
 
-7b. If so, run `php cleaner.php / true` to clean the whole server.
-
-### Do not leave this code on your server when done and delete all generated copies.
-##### You might want to download your stripped or vault files to better understand what the malicious code was doing while active.
+#### Delete all of things from your server when done: `rm -R __badcode__/`

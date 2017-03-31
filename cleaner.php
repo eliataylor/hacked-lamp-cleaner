@@ -4,9 +4,11 @@ require_once('scanDir.php');
 $args = $argv;
 
 $dir = (isset($argv[1]) && !empty($argv[1])) ? $argv[1] : '';
-$recursive = (isset($argv[2]) && !empty($argv[2])) ? (bool)$argv[2] : FALSE;
-$aggressive = (isset($argv[3]) && !empty($argv[3])) ? (bool)$argv[3] : FALSE;
-$file_ext = array("html","php");
+$file_types = (isset($argv[2]) && !empty($argv[2])) ? $argv[2] : "html,php";
+$file_types = explode(",", $file_types);
+
+$recursive = (isset($argv[3]) && !empty($argv[3])) ? (bool)$argv[3] : FALSE;
+$aggressive = (isset($argv[4]) && !empty($argv[4])) ? (bool)$argv[3] : FALSE;
 
 $context = explode('/', rtrim(getcwd(), '/'));
 $context = end($context);
@@ -26,7 +28,7 @@ if (!file_exists('infected.json')) {
   $corrections = json_decode($corrections, TRUE);
 }
 
-$files = scanDir::scan(explode(',', $dir), $file_ext, $recursive); // TODO: make recursive to first clean than crawl
+$files = scanDir::scan(explode(',', $dir), $file_types, $recursive); // TODO: make recursive to first clean than crawl
 foreach($files as $file) {
   $basename = basename($file);
   $basename = substr(basename($file), 0, strpos($basename, '.'));
