@@ -33,13 +33,14 @@ foreach($files as $file) {
   $basename = basename($file);
   $basename = substr($basename, 0, strpos($basename, '.'));
 
-  if (stripos($file, 'cleaner.php') > 0) continue;
+  if (stripos($file, 'badFlags.php') > 0 || stripos($file, '__vault__') > 0 || stripos($file, '__badcode__') > 0) continue;
 
   $updateFile = file_get_contents($file);
   $haystack = strtolower($updateFile);
   if ($aggressive === TRUE) {
     $haystack = preg_replace('/\s+/', ' ', $haystack); // WARN: ignores whitespace differences
   }
+  $modified = false;
 
   foreach($badFlags as $badFlag=>$context) {
     $badFlag = strtolower($badFlag);
@@ -64,6 +65,7 @@ foreach($files as $file) {
           if (!isset($corrections[$badFlag][$badCodeID])) $corrections[$badFlag][$badCodeID] = array($file=>0);
           else if (!isset($corrections[$badFlag][$badCodeID][$file])) $corrections[$badFlag][$badCodeID][$file] = 0;
           $corrections[$badFlag][$badCodeID][$file]++;
+          $modified =  true;
         } else if (isset($context['suffix'])) {
           while (strpos($haystack, $badFlag) > -1) {
             $remove = substr($haystack, strpos($haystack, $badFlag));
@@ -82,6 +84,7 @@ foreach($files as $file) {
             else if (!isset($corrections[$badFlag][$badCodeID][$file])) $corrections[$badFlag][$badCodeID][$file] = 0;
 
             $corrections[$badFlag][$badCodeID][$file]++;
+            $modified =  true;
 
           }
 
@@ -91,10 +94,13 @@ foreach($files as $file) {
         }
       }
   }
-  if ($aggressive === TRUE)  {
-    file_put_contents($file, $haystack);
-  } else {
-    file_put_contents($file, $updateFile);
+
+  if ($modified === TRUE) {
+    if ($aggressive === TRUE)  {
+      $success = file_put_contents($file, $haystack); // can fail on permissions
+    } else {
+      $success = file_put_contents($file, $updateFile);
+    }
   }
 }
 
