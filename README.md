@@ -61,3 +61,6 @@ php review.php > review.html
 ```
 
 ### Delete all of this from your server when done!!! `rm -R ../hacked`
+
+
+#### If you appreciate the project, consider making a donation from my Amazon Wish List: http://a.co/5vEH8e5 :)

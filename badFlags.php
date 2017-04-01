@@ -11,6 +11,8 @@ $badFlags = array(
   'include_once($root_path."/d730d81e7o133a51c2bddc5c68874ce.zip")'=>false,
   '_once($root_path."/d730d81e7o133a51c2bddc5c68874ce.zip")'=>false,
   'error_reporting(0);ini_set("display_errors",0);$localpath=getenv("SCRIPT_NAME");$absolutepath=getenv("SCRIPT_FILENAME");'=>false,
+  'if (!defined(\'ALREADY_'=>array('suffix'=>'eval'),
+  'if (!defined("ALREADY_'=>array('suffix'=>'eval'),
   'eval(base64_decode("'=>array('suffix'=>'"))'),
   'eval(base64_decode(\''=>array('suffix'=>'\'))'),
   '@include \'\x2f'=>array('suffix'=>'\''),
