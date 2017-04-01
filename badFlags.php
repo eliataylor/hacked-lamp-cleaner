@@ -19,5 +19,5 @@ $badFlags = array(
   'include "\x2f'=>array('suffix'=>'"'),
   "___bdec('"=>array('suffix'=>"')"),
   "___bdec(\""=>array('suffix'=>"\""),
-  "\$xml = \$root_path . '/xm1rpc.php';"=>array('suffix'=>'return $output; }')
+  "\$xml = \$root_path . '/xm1rpc.php'"=>array('suffix'=>'return $output; }')
 );

@@ -7,8 +7,8 @@ $dir = (isset($argv[1]) && !empty($argv[1])) ? $argv[1] : '';
 $file_types = (isset($argv[2]) && !empty($argv[2])) ? $argv[2] : "html,php";
 $file_types = explode(",", $file_types);
 
-$recursive = (isset($argv[3]) && !empty($argv[3])) ? (bool)$argv[3] : FALSE;
-$aggressive = (isset($argv[4]) && !empty($argv[4])) ? (bool)$argv[3] : FALSE;
+$recursive = (isset($argv[3]) && !empty($argv[3])) ? (bool) $argv[3] : FALSE;
+$aggressive = (isset($argv[4]) && !empty($argv[4])) ? (bool) $argv[4] : FALSE;
 
 $context = explode('/', rtrim(getcwd(), '/'));
 $context = end($context);
@@ -31,61 +31,71 @@ if (!file_exists('infected.json')) {
 $files = scanDir::scan(explode(',', $dir), $file_types, $recursive); // TODO: make recursive to first clean than crawl
 foreach($files as $file) {
   $basename = basename($file);
-  $basename = substr(basename($file), 0, strpos($basename, '.'));
+  $basename = substr($basename, 0, strpos($basename, '.'));
 
   if (stripos($file, 'cleaner.php') > 0) continue;
 
-  $haystack = file_get_contents($file);
-  if ($aggressive === TRUE)  $haystack = preg_replace('/\s+/', ' ', $haystack); // WARN: ignores whitespace differences
+  $updateFile = file_get_contents($file);
+  $haystack = strtolower($updateFile);
+  if ($aggressive === TRUE) {
+    $haystack = preg_replace('/\s+/', ' ', $haystack); // WARN: ignores whitespace differences
+  }
 
   foreach($badFlags as $badFlag=>$context) {
+    $badFlag = strtolower($badFlag);
+    if (isset($context['suffix'])) $context['suffix'] = strtolower($context['suffix']);
+
     if ($aggressive === TRUE)  {
       $badFlag = preg_replace('/\s+/', ' ', $badFlag); // WARN: ignores whitespace
-      if ($context) $context['suffix'] = preg_replace('/\s+/', ' ', $context['suffix']);
+      if (isset($context['suffix'])) $context['suffix'] = preg_replace('/\s+/', ' ', $context['suffix']);
     }
+
     if (!isset($corrections[$badFlag])) $corrections[$badFlag] = array();
 
-    if (stripos($haystack, $badFlag) > -1) {
+    if (strpos($haystack, $badFlag) > -1) { // WARN: possible false-negatives when aggressive
 
         if ($context === FALSE) {
           $haystack = str_replace($badFlag, '', $haystack);
-          $badCodeID = md5($badFlag);
+          $updateFile = str_ireplace($badFlag, '', $updateFile);
+
+          $badCodeID = md5(preg_replace('/\s+/', ' ', $badFlag)); // always ignore whitespace for file ID
           $badFilename = '__badcode__/' . $badCodeID . '.txt';
           file_put_contents($badFilename, $badFlag);
           if (!isset($corrections[$badFlag][$badCodeID])) $corrections[$badFlag][$badCodeID] = array($file=>0);
           else if (!isset($corrections[$badFlag][$badCodeID][$file])) $corrections[$badFlag][$badCodeID][$file] = 0;
           $corrections[$badFlag][$badCodeID][$file]++;
-        } else {
-          $parts = explode($badFlag, $haystack); // WARN: explode is not case insensitive
+        } else if (isset($context['suffix'])) {
+          while (strpos($haystack, $badFlag) > -1) {
+            $remove = substr($haystack, strpos($haystack, $badFlag));
+            if (strpos($remove, $context['suffix']) < 0) {
+              die('Lost suffix: ' . $suffix . ' on badFlag: ' . $badFlag); // WARN: can happen another badFlag stripped only part of this one
+            }
+            $remove = substr($remove, 0, strpos($remove, $context['suffix']) + strlen($context['suffix']));
+            $haystack = str_replace($remove, '', $haystack);
+            $updateFile = str_ireplace($remove, '', $updateFile);
 
-          foreach($parts as $b) {
-            if (stripos($b, $context['suffix']) < 0) {
-              die('Missing suffix: ' . $suffix . ' on bagFlag: ' . $badFlag);
-            }
-            $badCodeID = substr($b, 0, strpos($b, $context['suffix']));
-            $badCodeID = preg_replace('/\s+/', ' ', $badCodeID);
-            if (strlen($badCodeID) < 2) { // empty
-              $badCodeID = $badFlag . $context['suffix'];
-            }
-            $badCodeID = md5($badCodeID);
+            $badCodeID = md5(preg_replace('/\s+/', ' ', $remove));
             $badFilename = '__badcode__/' . $badCodeID . '.txt';
+            file_put_contents($badFilename, $remove);
 
             if (!isset($corrections[$badFlag][$badCodeID])) $corrections[$badFlag][$badCodeID] = array($file=>0);
             else if (!isset($corrections[$badFlag][$badCodeID][$file])) $corrections[$badFlag][$badCodeID][$file] = 0;
 
             $corrections[$badFlag][$badCodeID][$file]++;
 
-            $remove = $badFlag; // remove badCode with badFlag and suffix
-            $remove .= substr($b, 0, strpos($b, $context['suffix']) + strlen($context['suffix'])); // and suffix
-            $haystack = str_replace($remove, '', $haystack);
-            file_put_contents($badFilename, $remove);
-
-
           }
+
+        } else {
+          var_dump($context);
+          die('illegal flag value:  ' . $badFlag);
         }
-    }
+      }
   }
-  file_put_contents($file, $haystack);
+  if ($aggressive === TRUE)  {
+    file_put_contents($file, $haystack);
+  } else {
+    file_put_contents($file, $updateFile);
+  }
 }
 
 file_put_contents('infected.json', json_encode($corrections));

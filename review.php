@@ -15,7 +15,7 @@ if (!file_exists('infected.json')) {
   $badFlags = json_decode(file_get_contents('infected.json'), TRUE);
   foreach($badFlags as $badFlag => $badBlocks) {
     if (count($badBlocks) < 1) {
-      echo '<section><p>No matches found. Consider ignoring whitespace with run paramter</p><pre>'.$badFlag.'</pre></section>';
+      echo '<section><p>No matches found. Check badFlags or ignore whitespace</p><pre>'.$badFlag.'</pre></section>';
     }  else {
       echo '<section><h1>Bad Flag</h1><pre>'.$badFlag.'</pre>';
       echo '<h2>Number of variations of code starting with this flag: '.count($badBlocks).'</h2>';
