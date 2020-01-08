@@ -1,5 +1,5 @@
-# Cleaner script for hacked LAMP servers without root access (like shared hosting servers)
-## scan / copy / replace / review injected malicious code -  `"eval(base64_decode(..."` - from any files your server
+## Cleaner script for hacked LAMP servers without root access (like shared hosting servers)
+### scan / copy / replace / review injected malicious code -  `"eval(base64_decode(..."` - from any files your server
 
 ```
 php cleaner.php /path/to/clean html,php,extensions recursive|not aggressive|not
