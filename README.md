@@ -1,4 +1,4 @@
-# Cleaner script for hacked LAMP servers
+# Cleaner script for hacked LAMP servers without root access (like shared hosting servers)
 ## scan / copy / replace / review injected malicious code -  `"eval(base64_decode(..."` - from any files your server
 
 ```
@@ -63,4 +63,4 @@ php review.php > review.html
 ### Delete all of this from your server when done!!! `rm -R ../hacked`
 
 
-#### If you appreciate the project, consider making a donation from my Amazon Wish List: http://a.co/5vEH8e5 :)
+#### If you appreciate the project, consider making a donation from my (wife's) Amazon Wish List: http://a.co/5vEH8e5 :)
